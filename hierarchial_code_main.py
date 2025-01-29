@@ -16,17 +16,20 @@ from DetailsScraper import DetailsScraping
 
 class HierarchialMainScraper:
     def __init__(self, credentials_dict, url, num_pages=1, specific_brands=None, specific_pages=None):
+        # Drive initialization
         self.credentials_dict = credentials_dict
         self.scopes = ['https://www.googleapis.com/auth/drive']
         self.service = None
         self.parent_folder_id = '1HkfBH929hdehxGiDcthfq4Cf_hXKwN9T'
         
+        # Scraping initialization
         self.url = url
         self.num_pages = num_pages
         self.specific_brands = specific_brands or []
         self.specific_pages = specific_pages if specific_pages else num_pages
         self.data = []
 
+        # Main scraper initialization
         self.chunk_size = 2
         self.max_concurrent_links = 2
         self.logger = logging.getLogger(__name__)
@@ -236,7 +239,7 @@ if __name__ == "__main__":
     
     credentials_dict = json.loads(credentials_json)
     
-    # Group configs by URL
+    # Electronics configurations
     configs = [
         {
             "url": "https://www.q84sale.com/ar/electronics/cameras",
@@ -258,6 +261,36 @@ if __name__ == "__main__":
             "specific_brands": None,
             "specific_pages": 1
         }
+        # {
+        #     "url": "https://www.q84sale.com/ar/electronics/cameras",
+        #     "specific_brands": ["كاميرات مراقبة"],
+        #     "specific_pages": 5
+        # },
+        # {
+        #     "url": "https://www.q84sale.com/ar/electronics/cameras",
+        #     "specific_brands": ["كاميرات إحترافية"],
+        #     "specific_pages": 3
+        # },
+        # {
+        #     "url": "https://www.q84sale.com/ar/electronics/video-games-and-consoles",
+        #     "specific_brands": ["ألعاب الفيديو", "بيع حسابات", "بلاي ستيشن وملحقاتها"],
+        #     "specific_pages": 4
+        # },
+        # {
+        #     "url": "https://www.q84sale.com/ar/electronics/video-games-and-consoles",
+        #     "specific_brands": ["بطاقات شراء"],
+        #     "specific_pages": 3
+        # },
+        # {
+        #     "url": "https://www.q84sale.com/ar/electronics/devices-and-networking",
+        #     "specific_brands": None,
+        #     "specific_pages": 1
+        # },
+        # {
+        #     "url": "https://www.q84sale.com/ar/electronics/electronics-shops",
+        #     "specific_brands": None,
+        #     "specific_pages": 1
+        # }
     ]
 
     async def process_all():
@@ -270,6 +303,5 @@ if __name__ == "__main__":
                 specific_pages=config["specific_pages"]
             )
             await scraper.process_hierarchial_electronics()
-            await asyncio.sleep(5)  # Add delay between configs
 
     asyncio.run(process_all())
