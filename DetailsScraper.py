@@ -16,7 +16,7 @@ class DetailsScraping:
         self.url = url
         self.retries = retries  # Retry count for robustness
 
-    async def get_car_details(self):
+    async def get_card_details(self):
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
@@ -25,7 +25,7 @@ class DetailsScraping:
             page.set_default_navigation_timeout(30000)
             page.set_default_timeout(30000)  # General timeout
 
-            cars = []  # To store scraped cars
+            cards = []  # To store scraped cars
 
             for attempt in range(self.retries):
                 try:
@@ -34,23 +34,23 @@ class DetailsScraping:
                     await page.wait_for_selector('.StackedCard_card__Kvggc', timeout=30000)
 
                     # Extract car details
-                    car_cards = await page.query_selector_all('.StackedCard_card__Kvggc')
-                    for card in car_cards:
+                    card_cards = await page.query_selector_all('.StackedCard_card__Kvggc')
+                    for card in card_cards:
                         # Extract car information
                         link = await self.scrape_link(card)
-                        car_type = await self.scrape_car_type(card)
+                        card_type = await self.scrape_card_type(card)
                         title = await self.scrape_title(card)
                         pinned_today = await self.scrape_pinned_today(card)
 
                         # Scrape scrape_more_details from the car page
                         scrape_more_details = await self.scrape_more_details(link)
 
-                        cars.append({
+                        cards.append({
                             'id': scrape_more_details.get('id'),
                             'date_published': scrape_more_details.get('date_published'),
                             'relative_date': scrape_more_details.get('relative_date'),
                             'pin': pinned_today,
-                            'type': car_type,
+                            'type': card_type,
                             'title': title,
                             'description': scrape_more_details.get('description'),
                             'link': link,
@@ -79,7 +79,7 @@ class DetailsScraping:
                         page = await browser.new_page()
 
             await browser.close()
-            return cars
+            return cards
 
     # Method to scrape the link
     async def scrape_link(self, card):
@@ -88,7 +88,7 @@ class DetailsScraping:
         return f"{base_url}{rawlink}" if rawlink else None
 
     # Method to scrape the car type
-    async def scrape_car_type(self, card):
+    async def scrape_card_type(self, card):
         selector = '.text-6-med.text-neutral_600.styles_category__NQAci'
         element = await card.query_selector(selector)
         return await element.inner_text() if element else None
@@ -120,36 +120,63 @@ class DetailsScraping:
         return "Not Pinned"
 
     # New method to scrape the x value (second value)
+    # async def scrape_relative_date(self, page):
+    #     try:
+    #         # Define the parent container selector
+    #         parent_selector = '.d-flex.styles_topData__Sx1GF'
+
+    #         # Locate the parent container and get all the child divs with the desired class
+    #         parent_locator = page.locator(parent_selector)
+
+    #         # Wait for the parent container to be visible before proceeding
+    #         await parent_locator.wait_for(state="visible", timeout=10000)
+
+    #         # Get all child div elements with the class 'd-flex align-items-center styles_dataWithIcon__For9u'
+    #         child_divs = parent_locator.locator('.d-flex.align-items-center.styles_dataWithIcon__For9u')
+
+    #         # Wait until the elements are available and then fetch the second child div
+    #         await child_divs.first.wait_for(state="visible", timeout=10000)  # Ensure first child is available
+    #         await child_divs.nth(1).wait_for(state="visible", timeout=10000)  # Wait for second child to be visible
+
+    #         # Extract the x value (content of the second div)
+    #         relative_time_locator = child_divs.nth(1).locator('div.text-5-regular.m-text-6-med.text-neutral_600')
+    #         relative_time_text = await relative_time_locator.inner_text()
+    #         if relative_time_text:
+    #             stripped_time = relative_time_text.replace(" ago", "").strip()
+    #             return stripped_time  # Clean up whitespace
+    #         else:
+    #             print("relative_time value not found.")
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Error while scraping relative_time value: {e}")
+    #         return None
+
     async def scrape_relative_date(self, page):
         try:
-            # Define the parent container selector
-            parent_selector = '.d-flex.styles_topData__Sx1GF'
-
-            # Locate the parent container and get all the child divs with the desired class
-            parent_locator = page.locator(parent_selector)
-
-            # Wait for the parent container to be visible before proceeding
+            # First try to get all data items
+            parent_locator = page.locator('.d-flex.styles_topData__Sx1GF')
             await parent_locator.wait_for(state="visible", timeout=10000)
-
-            # Get all child div elements with the class 'd-flex align-items-center styles_dataWithIcon__For9u'
-            child_divs = parent_locator.locator('.d-flex.align-items-center.styles_dataWithIcon__For9u')
-
-            # Wait until the elements are available and then fetch the second child div
-            await child_divs.first.wait_for(state="visible", timeout=10000)  # Ensure first child is available
-            await child_divs.nth(1).wait_for(state="visible", timeout=10000)  # Wait for second child to be visible
-
-            # Extract the x value (content of the second div)
-            relative_time_locator = child_divs.nth(1).locator('div.text-5-regular.m-text-6-med.text-neutral_600')
-            relative_time_text = await relative_time_locator.inner_text()
-            if relative_time_text:
-                stripped_time = relative_time_text.replace(" ago", "").strip()
-                return stripped_time  # Clean up whitespace
-            else:
-                print("relative_time value not found.")
-                return None
-
+        
+            # Get all data items that contain both views and date
+            data_items = page.locator('.d-flex.align-items-center.styles_dataWithIcon__For9u')
+        
+            # Get the text content of all matching items
+            items = await data_items.all()
+        
+            for item in items:
+                # Get the text content
+                text = await item.inner_text()
+                # Check if this contains time-related words in Arabic
+                if any(word in text for word in ['منذ', 'ساعة', 'يوم', 'دقيقة', 'شهر']):
+                    # Get the specific time element within this container
+                    time_element = await item.locator('.text-5-regular.m-text-6-med.text-neutral_600').inner_text()
+                    return time_element.strip()
+                
+            return None
+        
         except Exception as e:
-            print(f"Error while scraping relative_time value: {e}")
+            print(f"Error while scraping relative_date: {e}")
             return None
 
     # Method to scrape date_published
