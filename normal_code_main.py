@@ -211,7 +211,7 @@ if __name__ == "__main__":
     
     async def main():
         scraper = ElectronicsMainScraper(electronics_data)
-        await scraper.scrape_all_contractingANDservices()
+        await scraper.scrape_all_electronics()
         
         # scraper2 = CarScraper(contractingANDservices_data_2)
         # await scraper2.scrape_brands_and_types()
