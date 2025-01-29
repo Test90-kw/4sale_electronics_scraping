@@ -67,7 +67,9 @@ class ElectronicsMainScraper:
             self.logger.info(f"No data to save for {electronic_name}, skipping Excel file creation.")
             return None
 
-        excel_file = Path(f"{electronic_name}.xlsx")
+        # Sanitize filename by replacing invalid characters
+        safe_name = electronic_name.replace('/', '_').replace('\\', '_')
+        excel_file = Path(f"{safe_name}.xlsx")
         try:
             df = pd.DataFrame(card_data)
             df.to_excel(excel_file, index=False)
