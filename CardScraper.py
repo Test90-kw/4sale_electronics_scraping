@@ -7,7 +7,7 @@ from DetailsScraper import DetailsScraping
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-class CarScraper:
+class CardScraper:
     def __init__(self, url):
         self.url = url
         self.data = []
@@ -41,13 +41,13 @@ class CarScraper:
                     await new_page.goto(full_brand_link)
 
                     details_scraper = DetailsScraping(full_brand_link)
-                    car_details = await details_scraper.get_car_details()
+                    card_details = await details_scraper.get_card_details()
                     await new_page.close()
 
                     self.data.append({
                         'brand_title': title,
                         'brand_link': full_brand_link.rsplit('/', 1)[0] + '/{}',  # Prepare template for pagination
-                        'available_cars': car_details,
+                        'available_cards': card_details,
                     })
 
                     # Print the details for each brand
