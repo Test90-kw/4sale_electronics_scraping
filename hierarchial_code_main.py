@@ -235,22 +235,22 @@ if __name__ == "__main__":
         {
             "url": "https://www.q84sale.com/ar/electronics/cameras",
             "specific_brands": ["كاميرات مراقبة"],
+            "specific_pages": 5
+        },
+        {
+            "url": "https://www.q84sale.com/ar/electronics/cameras",
+            "specific_brands": ["كاميرات إحترافية"],
             "specific_pages": 3
         },
         {
             "url": "https://www.q84sale.com/ar/electronics/video-games-and-consoles",
-            "specific_brands": ["ألعاب الفيديو", "بيع حسابات"],
+            "specific_brands": ["ألعاب الفيديو", "بيع حسابات", "بلاي ستيشن وملحقاتها"],
             "specific_pages": 4
         },
         {
             "url": "https://www.q84sale.com/ar/electronics/video-games-and-consoles",
-            "specific_brands": ["بلاي ستيشن وملحقاتها"],
-            "specific_pages": 3
-        },
-        {
-            "url": "https://www.q84sale.com/ar/electronics/video-games-and-consoles",
             "specific_brands": ["بطاقات شراء"],
-            "specific_pages": 2
+            "specific_pages": 3
         },
         {
             "url": "https://www.q84sale.com/ar/electronics/devices-and-networking",
