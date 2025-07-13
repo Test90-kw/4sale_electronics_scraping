@@ -55,15 +55,3 @@ class CardScraper:
 
             await browser.close()
         return self.data
-
-# # Correctly run the async function with an instance of the class
-# if __name__ == "__main__":
-#     # Initialize the scraper with the main page URL
-#     scraper = CarScraper("https://www.q84sale.com/ar/automotive/automotive-services")
-#
-#     # Use asyncio.run to execute the async function
-#     cars = asyncio.run(scraper.scrape_brands_and_types())
-#
-#     # Print the extracted details
-#     for car in cars:
-#         print(f"Brand: {car['brand_title']}, Link: {car['brand_link']}, available cars: {car['available_cars']}")
